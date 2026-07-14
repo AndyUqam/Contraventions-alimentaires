@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Demande d'inspection{% endblock %}
+
+{% block content %}
+    <h1>Demande d'inspection à la ville</h1>
+
+    <section class="carte-formulaire bloc-plainte">
+        <h2>Soumettre une demande d'inspection</h2>
+        <form id="formulaire-plainte">
+            <label for="nom-etablissement">Nom de l'établissement :</label>
+            <input type="text" id="nom-etablissement" name="nom_etablissement" required>
+
+            <label for="adresse-plainte">Adresse :</label>
+            <input type="text" id="adresse-plainte" name="adresse" required>
+
+            <label for="ville-plainte">Ville :</label>
+            <input type="text" id="ville-plainte" name="ville" required>
+
+            <label for="date-visite">Date de visite du client :</label>
+            <input type="date" id="date-visite" name="date_visite_client" required>
+
+            <label for="nom-client">Nom du client :</label>
+            <input type="text" id="nom-client" name="nom_client" required>
+
+            <label for="prenom-client">Prénom du client :</label>
+            <input type="text" id="prenom-client" name="prenom_client" required>
+
+            <label for="description-probleme">Description du problème :</label>
+            <textarea id="description-probleme" name="description_probleme" rows="5" required></textarea>
+
+            <button type="submit">Soumettre le formulaire d'inspection</button>
+        </form>
+
+        <!-- Message de succès ou d'erreur -->
+        <p id="message-plainte" hidden aria-live="polite"></p>
+    </section>
+
+    <!-- Script JavaScript pour gérer la soumission du formulaire -->
+    <script>
+        const formulairePlainte = document.getElementById('formulaire-plainte');
+        const messagePlainte = document.getElementById('message-plainte');
+
+        formulairePlainte.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            messagePlainte.hidden = true;
+            messagePlainte.textContent = '';
+
+            const donnees = {
+                nom_etablissement: document.getElementById('nom-etablissement').value,
+                adresse: document.getElementById('adresse-plainte').value,
+                ville: document.getElementById('ville-plainte').value,
+                date_visite_client: document.getElementById('date-visite').value,
+                nom_client: document.getElementById('nom-client').value,
+                prenom_client: document.getElementById('prenom-client').value,
+                description_probleme: document.getElementById('description-probleme').value,
+            };
+
+            <!-- Envoi du formulaire à /demandes-inspection dans app.py -->
+            try {
+                const reponse = await fetch('/demandes-inspection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(donnees),
+                });
+                const resultat = await reponse.json();
+
+                if (!reponse.ok) {
+                    messagePlainte.textContent =
+                        resultat.erreur || 'Erreur lors de l envoi de la plainte.';
+                    messagePlainte.hidden = false;
+                    return;
+                }
+
+                messagePlainte.textContent =
+                    `Demande créée avec succes. ID de demande: ${resultat.id}`;
+                messagePlainte.hidden = false;
+                formulairePlainte.reset();
+            } catch (erreur) {
+                messagePlainte.textContent = 'Erreur reseau, reessayez plus tard.';
+                messagePlainte.hidden = false;
+            }
+        });
+    </script>
+{% endblock %}

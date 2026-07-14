@@ -1,0 +1,190 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0 30px;
+}
+
+
+h1 {
+    background-color: #28a745;
+    color: white;
+    padding: 20px 0;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.lien-plainte {
+    text-align: center;
+    margin: -10px 0 24px 0;
+}
+
+.lien-plainte a {
+    color: #1b6f2a;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.lien-plainte a:hover {
+    text-decoration: underline;
+}
+
+.zone-formulaires {
+    max-width: 1100px;
+    margin: 0 auto 30px auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.carte-formulaire {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.carte-formulaire h2 {
+    margin: 0 0 18px 0;
+    text-align: center;
+}
+
+.carte-formulaire form {
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    row-gap: 14px;
+    column-gap: 12px;
+}
+
+.carte-formulaire form label {
+    margin-right: 4px;
+}
+
+input[type="text"], select {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type="date"] {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+table {
+    width: 95%;
+    margin: 24px auto 30px auto;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f1f1f1;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.colonne-montant {
+    text-align: right;
+    white-space: nowrap;
+    min-width: 125px;
+}
+
+.bloc-recherche-rapide {
+    margin: 0;
+}
+
+#message-recherche-rapide {
+    margin: 12px 0 0 0;
+}
+
+.bloc-resultats-rapides {
+    max-width: 1100px;
+    margin: 36px auto 0 auto;
+    padding-top: 12px;
+    position: relative;
+    z-index: 0;
+}
+
+.bloc-a6-restaurant {
+    max-width: 1500px;
+    margin: 30px auto 0 auto;
+}
+
+#message-restaurant {
+    margin: 12px 0 0 0;
+}
+
+.note-dans-formulaire-detaille {
+    margin: 14px 0 0 0;
+    font-size: 0.95rem;
+}
+
+.bloc-plainte {
+    max-width: 980px;
+    margin: 0 auto 30px auto;
+}
+
+.bloc-plainte form {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+}
+
+.bloc-plainte input[type="text"],
+.bloc-plainte input[type="date"],
+.bloc-plainte textarea {
+    width: 100%;
+    margin-right: 0;
+    box-sizing: border-box;
+}
+
+.bloc-plainte textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+#message-plainte {
+    margin: 14px 0 0 0;
+}
+
+@media (max-width: 900px) {
+    .zone-formulaires {
+        grid-template-columns: 1fr;
+    }
+}

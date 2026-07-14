@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Résultats de recherche{% endblock %}
+
+{% block content %}
+    <h1>Résultats détaillés de contraventions</h1>
+
+    <p class="lien-plainte"><a href="{{ url_for('index') }}">Retour à la recherche</a></p>
+
+    <!-- Affichage des résultats -->
+    {% if resultats|length == 0 %}
+        <p>Aucun résultat trouvé</p>
+    {% else %}
+        <table>
+            <tr>
+                <th>Id poursuite</th>
+                <th>Business id</th>
+                <th>Établissement</th>
+                <th>Propriétaire</th>
+                <th>Adresse</th>
+                <th>Ville</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th class="colonne-montant">Montant</th>
+                <th>Date de jugement</th>
+                <th>Statut</th>
+                <th>Date statut</th>
+                <th>Catégorie</th>
+            </tr>
+            {% for rangee in resultats %}
+            <tr>
+                <td>{{ rangee['id_poursuite'] }}</td>
+                <td>{{ rangee['business_id'] }}</td>
+                <td>{{ rangee['etablissement'] }}</td>
+                <td>{{ rangee['proprietaire'] }}</td>
+                <td>{{ rangee['adresse'] }}</td>
+                <td>{{ rangee['ville'] }}</td>
+                <td>
+                    {% set date_infraction = rangee['date']|string %}
+                    {% if date_infraction and date_infraction|length == 8 %}
+                        {{ date_infraction[0:4] }}/{{ date_infraction[4:6] }}/{{ date_infraction[6:8] }}
+                    {% else %}
+                        {{ rangee['date'] }}
+                    {% endif %}
+                </td>
+                <td>{{ rangee['description'] }}</td>
+                <td class="colonne-montant">
+                    {% if rangee['montant'] %}
+                        {{ '%.2f'|format(rangee['montant']|float) }} $
+                    {% else %}
+                        {{ rangee['montant'] }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% set date_jugement = rangee['date_jugement']|string %}
+                    {% if date_jugement and date_jugement|length == 8 %}
+                        {{ date_jugement[0:4] }}/{{ date_jugement[4:6] }}/{{ date_jugement[6:8] }}
+                    {% else %}
+                        {{ rangee['date_jugement'] }}
+                    {% endif %}
+                </td>
+                <td>{{ rangee['statut'] }}</td>
+                <td>
+                    {% set date_statut = rangee['date_statut']|string %}
+                    {% if date_statut and date_statut|length == 8 %}
+                        {{ date_statut[0:4] }}/{{ date_statut[4:6] }}/{{ date_statut[6:8] }}
+                    {% else %}
+                        {{ rangee['date_statut'] }}
+                    {% endif %}
+                </td>
+                <td>{{ rangee['categorie'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

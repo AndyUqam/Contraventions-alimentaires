@@ -1,0 +1,144 @@
+#%RAML 1.0
+title: Service des contraventions
+version: v1
+/contrevenants:
+  get:
+    description: Liste des contraventions existantes entre deux dates.
+    queryParameters:
+      du:
+        type: date-only
+        required: true
+        example: 2021-03-14
+      au:
+        type: date-only
+        required: true
+        example: 2024-11-26
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                {
+                  "id_poursuite": "3845",
+                  "business_id": "1001",
+                  "date": "20150510",
+                  "description": "Description de l'infraction"
+                }
+              ]
+      400:
+        body:
+          application/json:
+            example: |
+              { "erreur": "Les dates doivent être au format ISO 8601 (YYYY-MM-DD)." }
+
+/etablissements-infractions:
+  get:
+    description: Retourne la liste des établissements ayant commis une ou plusieurs infractions, avec leur nombre d'infractions.
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                {
+                  "etablissement": "Restaurant-test A",
+                  "nombre_infractions": 6
+                },
+                {
+                  "etablissement": "Restaurant-test B",
+                  "nombre_infractions": 1
+                }
+              ]
+
+/etablissements-infractions/xml:
+  get:
+    description: Retour des mêmes données que /etablissements-infractions mais en format XML et encodé en UTF-8.
+    responses:
+      200:
+        body:
+          application/xml:
+            example: |
+              <?xml version="1.0" encoding="UTF-8"?>
+              <etablissements>
+                <item>
+                  <etablissement>Restaurant-test A</etablissement>
+                  <nombre_infractions>6</nombre_infractions>
+                </item>
+                <item>
+                  <etablissement>Restaurant-test B</etablissement>
+                  <nombre_infractions>1</nombre_infractions>
+                </item>
+              </etablissements>
+
+/etablissements-infractions/csv:
+  get:
+    description: Retour des mêmes données que /etablissements-infractions mais en format CSV encodé en UTF-8.
+    responses:
+      200:
+        body:
+          text/csv:
+            example: |
+              etablissement,nombre_infractions
+              Restaurant-test A,4
+              Restaurant-test B,2
+
+/demandes-inspection:
+  post:
+    description: Création d'une demande d'inspection à partir d'un document JSON validé avec json-schema.
+    body:
+      application/json:
+        example: |
+          {
+            "nom_etablissement": "Restaurant Test",
+            "adresse": "1234 Rue Exemple-Test",
+            "ville": "Montreal",
+            "date_visite_client": "2026-04-14",
+            "nom_client": "Richelieu",
+            "prenom_client": "Jean",
+            "description_probleme": "Présence de cheveux dans les plats."
+          }
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "Demande d'inspection créée avec succès.",
+                "id": 42
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "erreur": "Demande invalide: 'ville' est un champ obligatoire"
+              }
+
+  /{id}:
+    delete:
+      description: Suppression d'une demande d'inspection existante à partir de son identifiant.
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "message": "Demande d'inspection supprimée avec succès.",
+                  "id": 42
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "erreur": "Demande d'inspection introuvable."
+                }
+
+/doc:
+  get:
+    description: Affiche la représentation HTML du document RAML du service.
+    responses:
+      200:
+        body:
+          text/html:

@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Recherche de contraventions{% endblock %}
+
+{% block content %}
+    <!-- Barre de nom de app web -->
+    <h1>Recherche de contraventions alimentaires</h1>
+    <p class="lien-plainte">
+        <a href="{{ url_for('page_plainte') }}">Faire une demande d'inspection</a>
+    </p>
+
+    <section class="zone-formulaires">
+        <div class="carte-formulaire bloc-recherche-rapide">
+            <h2>Recherche rapide par période</h2>
+            <form id="formulaire-rapide">
+                <label for="date-du">Du :</label>
+                <input type="date" id="date-du" name="du" required>
+
+                <label for="date-au">Au :</label>
+                <input type="date" id="date-au" name="au" required>
+
+                <button type="submit">Rechercher rapidement</button>
+            </form>
+        </div>
+
+        <div class="carte-formulaire">
+            <h2>Recherche détaillée</h2>
+            <form method="post" action="{{ url_for('resultats') }}">
+                <!-- Formulaire de recherche -->
+                <label for="critere">Rechercher par :</label>
+                <select name="critere" id="critere" required>
+                    <!-- Valeur par défaut (initiale), devient invisible lors de la sélection -->
+                    <option value="" disabled selected hidden>Choisir un critère</option>
+                    <!-- Non-sélectionnable -->
+                    <option value="" disabled>Choisir un critère</option>
+                    <!-- critère: Nom d'établissement -->
+                    <option value="nom_etablissement" {% if critere == 'nom_etablissement' %}selected{% endif %}>Nom d'établissement</option>
+                    <!-- critère: Propriétaire -->
+                    <option value="proprietaire" {% if critere == 'proprietaire' %}selected{% endif %}>Propriétaire</option>
+                    <!-- critère: Adresse -->
+                    <option value="adresse" {% if critere == 'adresse' %}selected{% endif %}>Rue</option>
+                </select>
+                <!-- Chaîne pour recherche -->
+                <input type="text" name="chaine" id="champ" value="{{ chaine }}" required>
+                <!-- Bouton de soumission -->
+                <button type="submit">Rechercher avec détail</button>
+            </form>
+            <p class="note-dans-formulaire-detaille">
+                La recherche affiche les résultats sur une nouvelle page.
+            </p>
+        </div>
+    </section>
+
+    <section class="bloc-resultats-rapides">
+        <h2 hidden>Résultats de la recherche rapide</h2>
+        <p id="message-recherche-rapide" hidden aria-live="polite"></p>
+
+        <table id="tableau-recherche-rapide" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Établissement</th>
+                    <th>Nombre de contraventions</th>
+                </tr>
+            </thead>
+            <tbody id="corps-tableau-recherche-rapide"></tbody>
+        </table>
+    </section>
+
+    <section class="carte-formulaire bloc-a6-restaurant">
+        <h2>Recherche des infractions par restaurant</h2>
+        <form id="formulaire-restaurant">
+            <label for="restaurant-select">Restaurant :</label>
+            <select id="restaurant-select" name="restaurant" required>
+                <option value="" selected disabled>Choisir un restaurant</option>
+            </select>
+            <button type="submit">Voir les infractions</button>
+        </form>
+
+        <p id="message-restaurant" hidden aria-live="polite"></p>
+
+        <!-- Tableau des infractions pour le restaurant sélectionné -->
+        <table id="tableau-restaurant" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Adresse</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody id="corps-tableau-restaurant"></tbody>
+        </table>
+    </section>
+
+    <script>
+        const formulaireRapide = document.getElementById('formulaire-rapide');
+        const messageRapide = document.getElementById('message-recherche-rapide');
+        const tableauRapide = document.getElementById('tableau-recherche-rapide');
+        const corpsTableauRapide = document.getElementById(
+            'corps-tableau-recherche-rapide'
+        );
+        const formulaireRestaurant = document.getElementById(
+            'formulaire-restaurant'
+        );
+        const selectRestaurant = document.getElementById('restaurant-select');
+        const messageRestaurant = document.getElementById('message-restaurant');
+        const tableauRestaurant = document.getElementById('tableau-restaurant');
+        const corpsTableauRestaurant = document.getElementById(
+            'corps-tableau-restaurant'
+        );
+
+        function formaterDate(dateTexte) {
+            if (dateTexte && String(dateTexte).length === 8) {
+                return `${dateTexte.slice(0, 4)}/${dateTexte.slice(4, 6)}/${
+                    dateTexte.slice(6, 8)
+                }`;
+            }
+            return dateTexte || '';
+        }
+
+        // Formatage du montant: 2 décimales et signe de dollar à la fin
+        function formaterMontant(valeur) {
+            if (valeur === null || valeur === undefined || valeur === '') {
+                return '';
+            }
+            const montant = Number(valeur);
+            if (Number.isNaN(montant)) {
+                return String(valeur);
+            }
+            return `${montant.toFixed(2)} $`;
+        }
+
+        // Chargement de la liste des restaurants
+        async function chargerRestaurants() {
+            try {
+                const reponse = await fetch('/restaurants');
+                const restaurants = await reponse.json();
+
+                if (!reponse.ok) {
+                    return;
+                }
+
+                for (const nomRestaurant of restaurants) {
+                    const option = document.createElement('option');
+                    option.value = nomRestaurant;
+                    option.textContent = nomRestaurant;
+                    selectRestaurant.appendChild(option);
+                }
+            } catch (erreur) {
+                // Liste vide si erreur quelconque
+            }
+        }
+
+        chargerRestaurants();
+
+        formulaireRapide.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const dateDu = document.getElementById('date-du').value;
+            const dateAu = document.getElementById('date-au').value;
+
+            messageRapide.textContent = '';
+            messageRapide.hidden = true;
+            tableauRapide.style.display = 'none';
+            corpsTableauRapide.innerHTML = '';
+
+            try {
+                const reponse = await fetch(
+                    `/contrevenants?du=${encodeURIComponent(dateDu)}` +
+                    `&au=${encodeURIComponent(dateAu)}`
+                );
+                const donnees = await reponse.json();
+
+                if (!reponse.ok) {
+                    messageRapide.textContent =
+                        donnees.erreur || 'Erreur pendant la recherche';
+                    messageRapide.hidden = false;
+                    return;
+                }
+
+                const compteParEtablissement = {};
+                for (const contravention of donnees) {
+                    const nom = contravention.etablissement || 'Inconnu';
+                    if (!compteParEtablissement[nom]) {
+                        compteParEtablissement[nom] = 0;
+                    }
+                    compteParEtablissement[nom] += 1;
+                }
+
+                const lignes = Object.entries(compteParEtablissement)
+                    .sort((a, b) => b[1] - a[1]);
+
+                if (lignes.length === 0) {
+                    messageRapide.textContent =
+                        'Aucun contrevenant trouvé pour cette période';
+                    messageRapide.hidden = false;
+                    return;
+                }
+
+                for (const [etablissement, nombre] of lignes) {
+                    const tr = document.createElement('tr');
+
+                    const tdNom = document.createElement('td');
+                    tdNom.textContent = etablissement;
+
+                    const tdNombre = document.createElement('td');
+                    tdNombre.textContent = String(nombre);
+
+                    tr.appendChild(tdNom);
+                    tr.appendChild(tdNombre);
+                    corpsTableauRapide.appendChild(tr);
+                }
+
+                tableauRapide.style.display = '';
+            } catch (erreur) {
+                messageRapide.textContent = 'Erreur réseau, réessayez plus tard.';
+                messageRapide.hidden = false;
+            }
+        });
+
+        // Affichage du tableau des infractions pour un restaurant donné
+        formulaireRestaurant.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const nomRestaurant = selectRestaurant.value;
+
+            messageRestaurant.textContent = '';
+            messageRestaurant.hidden = true;
+            tableauRestaurant.style.display = 'none';
+            corpsTableauRestaurant.innerHTML = '';
+
+            try {
+                const reponse = await fetch(
+                    '/infractions-restaurant?restaurant=' +
+                    encodeURIComponent(nomRestaurant)
+                );
+                const donnees = await reponse.json();
+
+                if (!reponse.ok) {
+                    messageRestaurant.textContent =
+                        donnees.erreur || 'Erreur pendant la recherche.';
+                    messageRestaurant.hidden = false;
+                    return;
+                }
+
+                if (donnees.length === 0) {
+                    messageRestaurant.textContent =
+                        'Aucune infraction trouvée pour ce restaurant.';
+                    messageRestaurant.hidden = false;
+                    return;
+                }
+
+                // Valeurs de chaque infraction
+                for (const infraction of donnees) {
+                    const tr = document.createElement('tr');
+
+                    const tdDate = document.createElement('td');
+                    tdDate.textContent = formaterDate(infraction.date);
+
+                    const tdDescription = document.createElement('td');
+                    tdDescription.textContent = infraction.description || '';
+
+                    const tdAdresse = document.createElement('td');
+                    tdAdresse.textContent = infraction.adresse || '';
+
+                    const tdMontant = document.createElement('td');
+                    tdMontant.className = 'colonne-montant';
+                    tdMontant.textContent = formaterMontant(infraction.montant);
+
+                    const tdStatut = document.createElement('td');
+                    tdStatut.textContent = infraction.statut || '';
+
+                    tr.appendChild(tdDate);
+                    tr.appendChild(tdDescription);
+                    tr.appendChild(tdAdresse);
+                    tr.appendChild(tdMontant);
+                    tr.appendChild(tdStatut);
+                    corpsTableauRestaurant.appendChild(tr);
+                }
+
+                tableauRestaurant.style.display = '';
+            } catch (erreur) {
+                messageRestaurant.textContent = 'Erreur, réessayez plus tard.';
+                messageRestaurant.hidden = false;
+            }
+        });
+    </script>
+{% endblock %}
