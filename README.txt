@@ -7,7 +7,7 @@ Cette application permet de consulter les contraventions alimentaires des
 recevoir l'annonce de nouvelles contraventions par courriel électronique.
 
 
-Pour démarrer le programme, veuillez suivre les étapes suivantes.
+Pour démarrer le programme, veuillez utiliser un environnement Linux et suivre les étapes suivantes.
 
 1- Installez Python3 sur votre système.
 Installer python 3
@@ -43,18 +43,18 @@ python3 reinit_projet.py
 
 
 Fonctionnalités choisies pour atteindre 100XP:
-A1 (10 XP)
-A2 (10 XP)
-A3 (5 XP)
-A4 (10 XP)
-A5 (10 XP)
-A6 (10 XP)
-C1 (10 XP)
-C2 (5 XP)
-C3 (5 XP)
-B1 (5 XP)
-D1 (15 XP)
-D2 (5 XP)
+A1 (10 XP): Importation des données dans la base SQLite
+A2 (10 XP): Recherche de contraventions par application Flask
+A3 (5 XP):  Synchronisation quotidienne des données
+A4 (10 XP): Service REST des contrevenants entre deux dates
+A5 (10 XP): Recherche rapide Ajax sur la page d'accueil
+A6 (10 XP): Recherche Ajax par nom de restaurant
+C1 (10 XP): Service REST des établissements avec nombre d'infractions en format JSON
+C2 (5 XP):  Service REST C1 en format XML UTF-8
+C3 (5 XP):  Service REST C1 en format CSV UTF-8
+B1 (5 XP):  Détection des nouvelles contraventions et envoi par courriel
+D1 (15 XP): Création d'une demande d'inspection (REST + page de plainte)
+D2 (5 XP):  Suppression d'une demande d'inspection (REST)
 
 
 La description approfondie des fonctionnalités ainsi que les procédures pour
@@ -73,7 +73,7 @@ A1 est testable en exécutant le programme Python dédié. Si l'importation du
 fichier CSV dans la base de données fonctionne, alors A1 est bien fonctionnelle.
 
 A3 n'est manuellement testable qu'en modifiant directement la base de données
-SQL, puisque l'application web n'a pas de fonction web dédié pour cette fin. 
+SQL, puisque l'application web n'a pas de fonction web dédiée pour cette fin. 
 
 B1 ne peut pas être testé manuellement, car un serveur SMTP est nécessaire. Du 
 codage additionnel a été fait pour éviter un crash ou un cas inattendu dans le
