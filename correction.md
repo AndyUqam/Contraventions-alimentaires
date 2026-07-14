@@ -231,7 +231,7 @@ vérifie que la page d’accueil contient les éléments A5 (formulaire rapide,
 
 ### Test manuel A5
 
-Sur l'application web, essayer la recherche rapide avec des dates rapprochés
+Sur l'application web, essayez la recherche rapide avec des dates rapprochés
  pour un résultat rapide.  
  Ensuite, comparez les résultats avec ceux de la base de données SQLite en
  effectuant une requête identique. Les résultats doivent être la même.
@@ -348,7 +348,7 @@ python3 -m unittest tests/test_c2.py
 ```
 
 - `test_etablissements_infractions_xml_utf8_et_trie` :  
-vérifie que la route C2 retourne du XML, avec charset UTF-8, et un ordre
+vérifie que la route C2 retourne du XML, avec charset UTF-8 et un ordre
  décroissant correct.
 
 ### Test manuel C2
@@ -457,7 +457,7 @@ Cette fonctionnalité est vérifiable que par ses tests unitaires qui simulent
 ### Description D1
 
 Il est possible de créer une demande d'inspection à la ville. Le document JSON
- est validé avec "json-schema" avant l'insertion dans la abse de données.
+ est validé avec "json-schema" avant l'insertion dans la base de données.
 
 - Route REST : "/demandes-inspection" (POST)
 - Champs requis : nom de l'établissement, adresse, ville, date de visite, nom
@@ -512,7 +512,7 @@ vérifie la présence du formulaire et de l appel Ajax sur la page "/plainte".
 
 ---
 
-## D2 – Suppression d'une demande d inspection (REST)
+## D2 – Suppression d'une demande d'inspection (REST)
 
 ### Description D2
 
@@ -541,7 +541,7 @@ vérifie qu'une demande inexistante retourne 404.
 
 Assurez-vous d'avoir une demande d'inspection existante dans la base de données
  SQLite et que l'application est bien démarée.  
-Ouvrez un autre terminal, car le 1er terminal doit garder l'application démarée
+Ouvrez un autre terminal, car le 1er terminal doit garder l'application démarrée
  en tout temps.
 Dans le nouveau terminal, entrez la commande suivante dont ID = l'id de la
  demande d'inspection à supprimer.
