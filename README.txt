@@ -9,7 +9,10 @@ recevoir l'annonce de nouvelles contraventions par courriel électronique.
 
 Pour démarrer le programme, veuillez utiliser un environnement Linux et suivre les étapes suivantes.
 
-1- Installez Python3 sur votre système.
+0 - Dans un environnement Linux, clonez le projet en mode https.
+git clone https://github.com/AndyUqam/Contraventions-alimentaires.git
+
+1- Installez Python3 sur votre système. La commande varie selon l'environnement de l'utilisateur.
 Installer python 3
 
 2- Dans la racine du projet, créez un nouvel environnement virtuel (automatiquement appelé venv ici).
